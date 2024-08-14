@@ -7,6 +7,8 @@ document.addEventListener('DOMContentLoaded', function () {
     // Select DOM elements
     const quoteDisplay = document.getElementById('quoteDisplay');
     const newQuoteButton = document.getElementById('newQuote');
+    const exportButton = document.getElementById('exportQuotes');
+    const importInput = document.getElementById('importQuotes');
 
     // Function to show a random quote
     function showRandomQuote() {
@@ -83,6 +85,42 @@ document.addEventListener('DOMContentLoaded', function () {
         return storedQuotes ? JSON.parse(storedQuotes) : [];
     }
 
+    // Function to export quotes to a JSON file
+    function exportQuotes() {
+        const blob = new Blob([JSON.stringify(quotes, null, 2)], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'quotes.json';
+        a.click();
+        URL.revokeObjectURL(url); // Clean up the URL object
+    }
+
+    // Function to import quotes from a JSON file
+    function importQuotes(event) {
+        const file = event.target.files[0];
+        if (file && file.type === 'application/json') {
+            const reader = new FileReader();
+            reader.onload = function () {
+                try {
+                    const importedQuotes = JSON.parse(reader.result);
+                    if (Array.isArray(importedQuotes)) {
+                        quotes = importedQuotes;
+                        saveQuotes(); // Save imported quotes to localStorage
+                        showRandomQuote(); // Optionally show a random quote
+                    } else {
+                        alert("Invalid JSON format. Please upload a valid quotes JSON file.");
+                    }
+                } catch (error) {
+                    alert("Error reading the JSON file.");
+                }
+            };
+            reader.readAsText(file);
+        } else {
+            alert("Please upload a valid JSON file.");
+        }
+    }
+
     // Attach event listeners
     newQuoteButton.addEventListener('click', function () {
         // Show form to add new quote
@@ -92,6 +130,9 @@ document.addEventListener('DOMContentLoaded', function () {
         // Show a new random quote
         showRandomQuote();
     });
+
+    exportButton.addEventListener('click', exportQuotes);
+    importInput.addEventListener('change', importQuotes);
 
     // Display a random quote on page load
     showRandomQuote();
