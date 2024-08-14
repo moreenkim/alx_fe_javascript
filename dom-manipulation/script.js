@@ -8,7 +8,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const quoteDisplay = document.getElementById('quoteDisplay');
     const newQuoteButton = document.getElementById('newQuote');
     const exportButton = document.getElementById('exportQuotes');
-    const importInput = document.getElementById('importQuotes');
+    const importInput = document.getElementById('importFile');
 
     // Function to show a random quote
     function showRandomQuote() {
@@ -97,28 +97,24 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     // Function to import quotes from a JSON file
-    function importQuotes(event) {
-        const file = event.target.files[0];
-        if (file && file.type === 'application/json') {
-            const reader = new FileReader();
-            reader.onload = function () {
-                try {
-                    const importedQuotes = JSON.parse(reader.result);
-                    if (Array.isArray(importedQuotes)) {
-                        quotes = importedQuotes;
-                        saveQuotes(); // Save imported quotes to localStorage
-                        showRandomQuote(); // Optionally show a random quote
-                    } else {
-                        alert("Invalid JSON format. Please upload a valid quotes JSON file.");
-                    }
-                } catch (error) {
-                    alert("Error reading the JSON file.");
+    function importFromJsonFile(event) {
+        const fileReader = new FileReader();
+        fileReader.onload = function (e) {
+            try {
+                const importedQuotes = JSON.parse(e.target.result);
+                if (Array.isArray(importedQuotes)) {
+                    quotes = importedQuotes; // Replace existing quotes with imported ones
+                    saveQuotes(); // Save the updated quotes array to localStorage
+                    showRandomQuote(); // Optionally show a random quote
+                    alert('Quotes imported successfully!');
+                } else {
+                    alert('Invalid JSON format. Please upload a valid quotes JSON file.');
                 }
-            };
-            reader.readAsText(file);
-        } else {
-            alert("Please upload a valid JSON file.");
-        }
+            } catch (error) {
+                alert('Error reading the JSON file.');
+            }
+        };
+        fileReader.readAsText(event.target.files[0]);
     }
 
     // Attach event listeners
@@ -132,7 +128,7 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 
     exportButton.addEventListener('click', exportQuotes);
-    importInput.addEventListener('change', importQuotes);
+    importInput.addEventListener('change', importFromJsonFile);
 
     // Display a random quote on page load
     showRandomQuote();
