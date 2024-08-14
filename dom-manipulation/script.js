@@ -2,11 +2,7 @@
 
 document.addEventListener('DOMContentLoaded', function () {
     // Initialize quotes array
-    let quotes = [
-        { text: "The only way to do great work is to love what you do.", category: "Inspirational" },
-        { text: "Life is what happens when you're busy making other plans.", category: "Life" },
-        { text: "The purpose of our lives is to be happy.", category: "Happiness" }
-    ];
+    let quotes = loadQuotes(); // Load quotes from localStorage or initialize with an empty array
 
     // Select DOM elements
     const quoteDisplay = document.getElementById('quoteDisplay');
@@ -56,7 +52,11 @@ document.addEventListener('DOMContentLoaded', function () {
             const quoteCategory = categoryInput.value.trim();
 
             if (quoteText && quoteCategory) {
+                // Add new quote to the quotes array
                 quotes.push({ text: quoteText, category: quoteCategory });
+                // Save the updated quotes array to localStorage
+                saveQuotes();
+                // Clear the form and show a new random quote
                 textInput.value = '';
                 categoryInput.value = '';
                 createAddQuoteForm(); // Reset the form
@@ -70,6 +70,17 @@ document.addEventListener('DOMContentLoaded', function () {
             formContainer.innerHTML = ''; // Clear any existing form
             formContainer.appendChild(form);
         }
+    }
+
+    // Save quotes to localStorage
+    function saveQuotes() {
+        localStorage.setItem('quotes', JSON.stringify(quotes));
+    }
+
+    // Load quotes from localStorage
+    function loadQuotes() {
+        const storedQuotes = localStorage.getItem('quotes');
+        return storedQuotes ? JSON.parse(storedQuotes) : [];
     }
 
     // Attach event listeners
